@@ -19,6 +19,7 @@
 #include <cslam_common_interfaces/msg/robot_ids_and_origin.hpp>
 #include <cslam_common_interfaces/msg/inter_robot_loop_closure.hpp>
 #include <cslam_common_interfaces/msg/intra_robot_loop_closure.hpp>
+#include <cslam_common_interfaces/msg/uwbranging.hpp>
 
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -94,6 +95,22 @@ namespace cslam
          *
          * @param msg
          */
+
+        /**
+         * @brief Receives uwbranging
+         *
+         * @param msg
+         */
+        void uwbranging_callback(
+            const cslam_common_interfaces::msg::Uwbranging::
+                ConstSharedPtr msg);
+
+        /**
+         * @brief Receives intra-robot loop closures
+         *
+         * @param msg
+         */
+        
         void intra_robot_loop_closure_callback(
             const cslam_common_interfaces::msg::IntraRobotLoopClosure::
                 ConstSharedPtr msg);
@@ -316,6 +333,11 @@ namespace cslam
                  std::vector<gtsam::BetweenFactor<gtsam::Pose3>>>
             inter_robot_loop_closures_;
 
+        //not done yet
+        std::map<std::pair<unsigned int, unsigned int>,
+                 std::vector<gtsam::RangeFactor<gtsam::Value>>>
+            uwb_ranging_;
+
         rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr
             odometry_subscriber_;
 
@@ -324,8 +346,12 @@ namespace cslam
             inter_robot_loop_closure_subscriber_;
 
         rclcpp::Subscription<
+            cslam_common_interfaces::msg::Uwbranging>::SharedPtr
+            uwbranging_subscriber_;
+
+        rclcpp::Subscription<
             cslam_common_interfaces::msg::IntraRobotLoopClosure>::SharedPtr
-            intra_robot_loop_closure_subscriber_;
+            InterRobotLoopClosure_;
 
         rclcpp::Publisher<cslam_common_interfaces::msg::OptimizationResult>::SharedPtr
             debug_optimization_result_publisher_;

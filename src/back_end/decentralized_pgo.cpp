@@ -55,11 +55,11 @@ DecentralizedPGO::DecentralizedPGO(std::shared_ptr<rclcpp::Node> &node)
       std::bind(&DecentralizedPGO::inter_robot_loop_closure_callback, this,
                 std::placeholders::_1));
   
-  # Hao added 0523
-  inter_robot_loop_closure_subscriber_ = node->create_subscription<
+  //Hao added 0523
+  uwbranging_subscriber_ = node->create_subscription<
       cslam_common_interfaces::msg::InterRobotLoopClosure>(
       "/cslam/Uwbranging", 1000,
-      std::bind(&DecentralizedPGO::Uwbranging_callback, this,
+      std::bind(&DecentralizedPGO::uwbranging_callback, this,
                 std::placeholders::_1));
 
 
@@ -328,7 +328,7 @@ void DecentralizedPGO::inter_robot_loop_closure_callback(
 }
 
 //howard add 0523
-void DecentralizedPGO::Uwbranging_callback(
+void DecentralizedPGO::uwbranging_callback(
     const cslam_common_interfaces::msg::Uwbranging::
         ConstSharedPtr msg)
 {
@@ -344,7 +344,7 @@ void DecentralizedPGO::Uwbranging_callback(
         gtsam::RangeFactor<gtsam::Value>(symbol_from, symbol_to, measurement,
                                            0);
 
-    inter_robot_loop_closures_[{std::min(msg->robot0_id, msg->robot1_id),
+    uwb_ranging_[{std::min(msg->robot0_id, msg->robot1_id),
                                 std::max(msg->robot0_id, msg->robot1_id)}]
         .push_back(factor);
     if (msg->robot0_id == robot_id_)
