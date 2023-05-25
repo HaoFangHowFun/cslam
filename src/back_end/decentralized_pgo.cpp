@@ -332,29 +332,29 @@ void DecentralizedPGO::uwbranging_callback(
     const cslam_common_interfaces::msg::Uwbranging::
         ConstSharedPtr msg)
 {
-    gtsam::Value measurement = msg->distance;
+    //gtsam::Value measurement = msg->distance;
 
-    unsigned char robot0_c = ROBOT_LABEL(msg->robot0_id);
-    gtsam::LabeledSymbol symbol_from(GRAPH_LABEL, robot0_c,
-                                     msg->robot0_keyframe_id);
-    unsigned char robot1_c = ROBOT_LABEL(msg->robot1_id);
-    gtsam::LabeledSymbol symbol_to(GRAPH_LABEL, robot1_c, msg->robot1_keyframe_id);
+  unsigned char robot0_c = ROBOT_LABEL(msg->robot0_id);
+  gtsam::LabeledSymbol symbol_from(GRAPH_LABEL, robot0_c,
+                                    msg->robot0_keyframe_id);
+  unsigned char robot1_c = ROBOT_LABEL(msg->robot1_id);
+  gtsam::LabeledSymbol symbol_to(GRAPH_LABEL, robot1_c, msg->robot1_keyframe_id);
 
-    gtsam::RangeFactor<gtsam::Value> factor =
-        gtsam::RangeFactor<gtsam::Value>(symbol_from, symbol_to, measurement,
-                                           0);
+  gtsam::RangeFactor<gtsam::Pose3> factor =
+      gtsam::RangeFactor<gtsam::Pose3>(symbol_from, symbol_to, msg->distance,
+                                          0);
 
-    uwb_ranging_[{std::min(msg->robot0_id, msg->robot1_id),
-                                std::max(msg->robot0_id, msg->robot1_id)}]
-        .push_back(factor);
-    if (msg->robot0_id == robot_id_)
-    {
-      connected_robots_.insert(msg->robot1_id);
-    }
-    else if (msg->robot1_id == robot_id_)
-    {
-      connected_robots_.insert(msg->robot0_id);
-    }
+  uwb_ranging_[{std::min(msg->robot0_id, msg->robot1_id),
+                              std::max(msg->robot0_id, msg->robot1_id)}]
+      .push_back(factor);
+  if (msg->robot0_id == robot_id_)
+  {
+    connected_robots_.insert(msg->robot1_id);
+  }
+  else if (msg->robot1_id == robot_id_)
+  {
+    connected_robots_.insert(msg->robot0_id);
+  }
   
 }
 

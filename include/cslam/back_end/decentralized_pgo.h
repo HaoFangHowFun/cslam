@@ -11,6 +11,7 @@
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/nonlinear/Values.h>
 #include <gtsam/slam/BetweenFactor.h>
+#include <gtsam/sam/RangeFactor.h>
 
 #include <cslam_common_interfaces/msg/keyframe_odom.hpp>
 #include <cslam_common_interfaces/msg/optimization_result.hpp>
@@ -335,7 +336,7 @@ namespace cslam
 
         //not done yet
         std::map<std::pair<unsigned int, unsigned int>,
-                 std::vector<gtsam::RangeFactor<gtsam::Value>>>
+                 std::vector<gtsam::RangeFactor<gtsam::Pose3>>>
             uwb_ranging_;
 
         rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr
@@ -351,7 +352,7 @@ namespace cslam
 
         rclcpp::Subscription<
             cslam_common_interfaces::msg::IntraRobotLoopClosure>::SharedPtr
-            InterRobotLoopClosure_;
+            intra_robot_loop_closure_subscriber_;
 
         rclcpp::Publisher<cslam_common_interfaces::msg::OptimizationResult>::SharedPtr
             debug_optimization_result_publisher_;
