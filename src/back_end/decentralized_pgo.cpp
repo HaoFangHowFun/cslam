@@ -54,6 +54,14 @@ DecentralizedPGO::DecentralizedPGO(std::shared_ptr<rclcpp::Node> &node)
       "/cslam/inter_robot_loop_closure", 1000,
       std::bind(&DecentralizedPGO::inter_robot_loop_closure_callback, this,
                 std::placeholders::_1));
+  
+  //Hao added 0523
+  uwbranging_subscriber_ = node->create_subscription<
+      cslam_common_interfaces::msg::InterRobotLoopClosure>(
+      "/cslam/Uwbranging", 1000,
+      std::bind(&DecentralizedPGO::uwbranging_callback, this,
+                std::placeholders::_1));
+
 
   write_current_estimates_subscriber_ =
       node->create_subscription<std_msgs::msg::String>(
@@ -317,6 +325,37 @@ void DecentralizedPGO::inter_robot_loop_closure_callback(
       connected_robots_.insert(msg->robot0_id);
     }
   }
+}
+
+//howard add 0523
+void DecentralizedPGO::uwbranging_callback(
+    const cslam_common_interfaces::msg::Uwbranging::
+        ConstSharedPtr msg)
+{
+    //gtsam::Value measurement = msg->distance;
+
+  unsigned char robot0_c = ROBOT_LABEL(msg->robot0_id);
+  gtsam::LabeledSymbol symbol_from(GRAPH_LABEL, robot0_c,
+                                    msg->robot0_keyframe_id);
+  unsigned char robot1_c = ROBOT_LABEL(msg->robot1_id);
+  gtsam::LabeledSymbol symbol_to(GRAPH_LABEL, robot1_c, msg->robot1_keyframe_id);
+
+  gtsam::RangeFactor<gtsam::Pose3> factor =
+      gtsam::RangeFactor<gtsam::Pose3>(symbol_from, symbol_to, msg->distance,
+                                          0);
+
+  uwb_ranging_[{std::min(msg->robot0_id, msg->robot1_id),
+                              std::max(msg->robot0_id, msg->robot1_id)}]
+      .push_back(factor);
+  if (msg->robot0_id == robot_id_)
+  {
+    connected_robots_.insert(msg->robot1_id);
+  }
+  else if (msg->robot1_id == robot_id_)
+  {
+    connected_robots_.insert(msg->robot0_id);
+  }
+  
 }
 
 void DecentralizedPGO::write_current_estimates_callback(
@@ -650,14 +689,12 @@ void DecentralizedPGO::optimized_estimates_callback(
     }
     update_transform_to_origin(first_pose);
 
-    if (enable_logs_) {
-      try{
-        logger_->write_logs();
-      }
-      catch (const std::exception &e)
-      {
-        RCLCPP_ERROR(node_->get_logger(), "Writing logs failed: %s", e.what());
-      }
+    try{
+      logger_->write_logs();
+    }
+    catch (const std::exception &e)
+    {
+      RCLCPP_ERROR(node_->get_logger(), "Writing logs failed: %s", e.what());
     }
   }
 }
