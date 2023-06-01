@@ -1,5 +1,9 @@
 #include "cslam/front_end/stereo_handler.h"
+<<<<<<< HEAD
 #include <rtabmap_conversions/MsgConversion.h>
+=======
+#include "cslam/front_end/sensor_msg_utils.h"
+>>>>>>> master
 
 using namespace rtabmap;
 using namespace cslam;
@@ -98,15 +102,24 @@ void StereoHandler::stereo_callback(
   }
 
   rclcpp::Time stamp =
+<<<<<<< HEAD
       rtabmap_conversions::timestampFromROS(image_rect_left->header.stamp) >
               rtabmap_conversions::timestampFromROS(image_rect_right->header.stamp)
+=======
+      rtabmap_ros::timestampFromROS(image_rect_left->header.stamp) >
+              rtabmap_ros::timestampFromROS(image_rect_right->header.stamp)
+>>>>>>> master
           ? image_rect_left->header.stamp
           : image_rect_right->header.stamp;
 
   Transform localTransform(0,0,0,0,0,0);
   if (base_frame_id_ != "")
   {
+<<<<<<< HEAD
 		localTransform = rtabmap_conversions::getTransform(
+=======
+		localTransform = rtabmap_ros::getTransform(
+>>>>>>> master
 		    base_frame_id_, image_rect_left->header.frame_id, stamp, *tf_buffer_, 0.1);
 		if (localTransform.isNull()) {
 		  RCLCPP_INFO(node_->get_logger(),
@@ -120,7 +133,11 @@ void StereoHandler::stereo_callback(
     bool alreadyRectified = true;
     rtabmap::Transform stereoTransform;
     if (!alreadyRectified) {
+<<<<<<< HEAD
       stereoTransform = rtabmap_conversions::getTransform(
+=======
+      stereoTransform = rtabmap_ros::getTransform(
+>>>>>>> master
           camera_info_right->header.frame_id, camera_info_left->header.frame_id,
           camera_info_left->header.stamp, *tf_buffer_, 0.1);
       if (stereoTransform.isNull()) {
@@ -146,11 +163,19 @@ void StereoHandler::stereo_callback(
     }
 
     rtabmap::StereoCameraModel stereoModel =
+<<<<<<< HEAD
         rtabmap_conversions::stereoCameraModelFromROS(*camera_info_left, *camera_info_right,
                                               localTransform, stereoTransform);
 
     if (stereoModel.baseline() == 0 && alreadyRectified) {
       stereoTransform = rtabmap_conversions::getTransform(
+=======
+        rtabmap_ros::stereoCameraModelFromROS(*camera_info_left, *camera_info_right,
+                                              localTransform, stereoTransform);
+
+    if (stereoModel.baseline() == 0 && alreadyRectified) {
+      stereoTransform = rtabmap_ros::getTransform(
+>>>>>>> master
           camera_info_left->header.frame_id, camera_info_right->header.frame_id,
           camera_info_left->header.stamp, *tf_buffer_, 0.1);
 
@@ -224,7 +249,11 @@ void StereoHandler::stereo_callback(
 
     auto data = std::make_shared<rtabmap::SensorData>(
         ptrImageLeft->image, ptrImageRight->image, stereoModel,
+<<<<<<< HEAD
         0, rtabmap_conversions::timestampFromROS(stamp));
+=======
+        0, rtabmap_ros::timestampFromROS(stamp));
+>>>>>>> master
 
     received_data_queue_.push_back(std::make_pair(data, odom));
     if (received_data_queue_.size() > max_queue_size_) {
@@ -255,17 +284,30 @@ void StereoHandler::local_descriptors_msg_to_sensor_data(
     rtabmap::SensorData &sensor_data) {
   // Fill descriptors
   rtabmap::StereoCameraModel stereo_model =
+<<<<<<< HEAD
       rtabmap_conversions::stereoCameraModelFromROS(msg->data.rgb_camera_info,
+=======
+      rtabmap_ros::stereoCameraModelFromROS(msg->data.rgb_camera_info,
+>>>>>>> master
                                             msg->data.depth_camera_info,
                                             rtabmap::Transform::getIdentity());
   sensor_data = rtabmap::SensorData(
       cv::Mat(), cv::Mat(), stereo_model, 0,
+<<<<<<< HEAD
       rtabmap_conversions::timestampFromROS(msg->data.header.stamp));
 
   std::vector<cv::KeyPoint> kpts;
   rtabmap_conversions::keypointsFromROS(msg->data.key_points, kpts);
   std::vector<cv::Point3f> kpts3D;
   rtabmap_conversions::points3fFromROS(msg->data.points, kpts3D);
+=======
+      rtabmap_ros::timestampFromROS(msg->data.header.stamp));
+
+  std::vector<cv::KeyPoint> kpts;
+  rtabmap_ros::keypointsFromROS(msg->data.key_points, kpts);
+  std::vector<cv::Point3f> kpts3D;
+  rtabmap_ros::points3fFromROS(msg->data.points, kpts3D);
+>>>>>>> master
   auto descriptors = rtabmap::uncompressData(msg->data.descriptors);
   sensor_data.setFeatures(kpts, kpts3D, descriptors);
 }

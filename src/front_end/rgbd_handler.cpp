@@ -1,5 +1,9 @@
 #include "cslam/front_end/rgbd_handler.h"
+<<<<<<< HEAD
 #include <rtabmap_conversions/MsgConversion.h>
+=======
+#include "cslam/front_end/sensor_msg_utils.h"
+>>>>>>> master
 
 // For visualization
 #include <pcl_conversions/pcl_conversions.h>
@@ -202,12 +206,20 @@ void RGBDHandler::rgbd_callback(
     return;
   }
 
+<<<<<<< HEAD
   rclcpp::Time stamp = rtabmap_conversions::timestampFromROS(image_rect_rgb->header.stamp) > rtabmap_conversions::timestampFromROS(image_rect_depth->header.stamp) ? image_rect_rgb->header.stamp : image_rect_depth->header.stamp;
+=======
+  rclcpp::Time stamp = rtabmap_ros::timestampFromROS(image_rect_rgb->header.stamp) > rtabmap_ros::timestampFromROS(image_rect_depth->header.stamp) ? image_rect_rgb->header.stamp : image_rect_depth->header.stamp;
+>>>>>>> master
 
 	Transform local_transform(0,0,0,0,0,0);
   if (base_frame_id_ != "")
   {
+<<<<<<< HEAD
 		local_transform = rtabmap_conversions::getTransform(base_frame_id_, image_rect_rgb->header.frame_id, stamp, *tf_buffer_, 0.1);
+=======
+		local_transform = rtabmap_ros::getTransform(base_frame_id_, image_rect_rgb->header.frame_id, stamp, *tf_buffer_, 0.1);
+>>>>>>> master
 		if (local_transform.isNull())
 		{
 		  return;
@@ -230,7 +242,11 @@ void RGBDHandler::rgbd_callback(
 
   cv_bridge::CvImageConstPtr ptr_depth = cv_bridge::toCvShare(image_rect_depth);
 
+<<<<<<< HEAD
   CameraModel camera_model = rtabmap_conversions::cameraModelFromROS(*camera_info_rgb, local_transform);
+=======
+  CameraModel camera_model = rtabmap_ros::cameraModelFromROS(*camera_info_rgb, local_transform);
+>>>>>>> master
 
   // copy data
   cv::Mat rgb, depth;
@@ -241,7 +257,11 @@ void RGBDHandler::rgbd_callback(
       rgb, depth,
       camera_model,
       0,
+<<<<<<< HEAD
       rtabmap_conversions::timestampFromROS(stamp));
+=======
+      rtabmap_ros::timestampFromROS(stamp));
+>>>>>>> master
 
   received_data_queue_.push_back(std::make_pair(data, odom));
   if (received_data_queue_.size() > max_queue_size_)
@@ -395,10 +415,17 @@ void RGBDHandler::process_new_sensor_data()
 
 void RGBDHandler::sensor_data_to_rgbd_msg(
     const std::shared_ptr<rtabmap::SensorData> sensor_data,
+<<<<<<< HEAD
     rtabmap_msgs::msg::RGBDImage &msg_data)
 {
   rtabmap_msgs::msg::RGBDImage data;
   rtabmap_conversions::rgbdImageToROS(*sensor_data, msg_data, "camera");
+=======
+    rtabmap_ros::msg::RGBDImage &msg_data)
+{
+  rtabmap_ros::msg::RGBDImage data;
+  rtabmap_ros::rgbdImageToROS(*sensor_data, msg_data, "camera");
+>>>>>>> master
 }
 
 void RGBDHandler::local_descriptors_request(
@@ -450,7 +477,11 @@ void RGBDHandler::receive_local_keyframe_match(
     if (!t.isNull())
     {
       lc.success = true;
+<<<<<<< HEAD
       rtabmap_conversions::transformToGeometryMsg(t, lc.transform);
+=======
+      rtabmap_ros::transformToGeometryMsg(t, lc.transform);
+>>>>>>> master
     }
     else
     {
@@ -476,6 +507,7 @@ void RGBDHandler::local_descriptors_msg_to_sensor_data(
 {
   // Fill descriptors
   rtabmap::CameraModel camera_model =
+<<<<<<< HEAD
       rtabmap_conversions::cameraModelFromROS(msg->data.rgb_camera_info,
                                       rtabmap::Transform::getIdentity());
   sensor_data = rtabmap::SensorData(
@@ -486,6 +518,18 @@ void RGBDHandler::local_descriptors_msg_to_sensor_data(
   rtabmap_conversions::keypointsFromROS(msg->data.key_points, kpts);
   std::vector<cv::Point3f> kpts3D;
   rtabmap_conversions::points3fFromROS(msg->data.points, kpts3D);
+=======
+      rtabmap_ros::cameraModelFromROS(msg->data.rgb_camera_info,
+                                      rtabmap::Transform::getIdentity());
+  sensor_data = rtabmap::SensorData(
+      cv::Mat(), cv::Mat(), camera_model, 0,
+      rtabmap_ros::timestampFromROS(msg->data.header.stamp));
+
+  std::vector<cv::KeyPoint> kpts;
+  rtabmap_ros::keypointsFromROS(msg->data.key_points, kpts);
+  std::vector<cv::Point3f> kpts3D;
+  rtabmap_ros::points3fFromROS(msg->data.points, kpts3D);
+>>>>>>> master
   auto descriptors = rtabmap::uncompressData(msg->data.descriptors);
   sensor_data.setFeatures(kpts, kpts3D, descriptors);
 }
@@ -528,7 +572,11 @@ void RGBDHandler::receive_local_image_descriptors(
       if (!t.isNull())
       {
         lc.success = true;
+<<<<<<< HEAD
         rtabmap_conversions::transformToGeometryMsg(t, lc.transform);
+=======
+        rtabmap_ros::transformToGeometryMsg(t, lc.transform);
+>>>>>>> master
         inter_robot_loop_closure_publisher_->publish(lc);
       }
       else

@@ -9,6 +9,10 @@ from collections import namedtuple
 GlobalDescriptor = namedtuple('GlobalDescriptor',
                               ['keyframe_id', 'robot_id', 'descriptor'])
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 def set_params():
     params = {}
     params['robot_id'] = 0

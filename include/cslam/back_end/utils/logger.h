@@ -31,11 +31,15 @@ namespace cslam
 {
 
     class Logger
+<<<<<<< HEAD
     { 
     /**
      * @brief Logger class to log various metrics
      * 
      */
+=======
+    { // TODO: document
+>>>>>>> master
     public:
         Logger(std::shared_ptr<rclcpp::Node> &node, const unsigned int &robot_id, const unsigned int &max_nb_robots, const std::string &log_folder);
 

@@ -3,7 +3,11 @@
 
 #include <rclcpp/rclcpp.hpp>
 
+<<<<<<< HEAD
 #include <rtabmap_msgs/msg/rgbd_image.hpp>
+=======
+#include <rtabmap_ros/msg/rgbd_image.hpp>
+>>>>>>> master
 
 #include <rtabmap/core/Compression.h>
 #include <rtabmap/core/Memory.h>
@@ -46,7 +50,11 @@
 
 #include <memory>
 
+<<<<<<< HEAD
 #include <rtabmap_conversions/MsgConversion.h>
+=======
+#include "cslam/front_end/sensor_msg_utils.h"
+>>>>>>> master
 #include "cslam/front_end/sensor_handler_interface.h"
 #include "cslam/front_end/visualization_utils.h"
 
@@ -122,11 +130,19 @@ namespace cslam
          * @brief converts sensor data to descriptor msg
          *
          * @param sensor_data local descriptors
+<<<<<<< HEAD
          * @param msg_data rtabmap_msgs::msg::RGBDImage&
          */
         void sensor_data_to_rgbd_msg(
             const std::shared_ptr<rtabmap::SensorData> sensor_data,
             rtabmap_msgs::msg::RGBDImage &msg_data);
+=======
+         * @param msg_data rtabmap_ros::msg::RGBDImage&
+         */
+        void sensor_data_to_rgbd_msg(
+            const std::shared_ptr<rtabmap::SensorData> sensor_data,
+            rtabmap_ros::msg::RGBDImage &msg_data);
+>>>>>>> master
 
         /**
          * @brief Generate a new keyframe according to the policy
@@ -139,6 +155,10 @@ namespace cslam
 
         /**
          * @brief Function to send the image to the python node
+<<<<<<< HEAD
+=======
+         * TODO: Move to parent class
+>>>>>>> master
          *
          * @param keypoints_data keyframe keypoints data
          */
@@ -146,6 +166,10 @@ namespace cslam
 
         /**
          * @brief Function to send the image to the python node
+<<<<<<< HEAD
+=======
+         * TODO: Move to parent class
+>>>>>>> master
          *
          * @param keypoints_data keyframe keypoints data
          * @param gps_data GPS data

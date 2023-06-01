@@ -6,9 +6,14 @@ import rclpy
 
 
 class NeighborManager():
+<<<<<<< HEAD
     """Manage neighbors to keep track of which other robots are in communication range
     """
     def __init__(self, node, params): 
+=======
+
+    def __init__(self, node, params):  # TODO: document
+>>>>>>> master
         self.node = node
         self.params = params
         self.robot_id = self.params['robot_id']

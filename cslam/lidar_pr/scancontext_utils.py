@@ -6,6 +6,10 @@ np.set_printoptions(precision=4)
 import time
 from scipy import spatial
 
+<<<<<<< HEAD
+=======
+import rclpy#TODO: remove
+>>>>>>> master
 
 def xy2theta(x, y):
     if (x >= 0 and y >= 0): 

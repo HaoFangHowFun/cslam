@@ -18,6 +18,10 @@ class LoopClosureSparseMatching(object):
         # Extract params
         self.params = params
         # Initialize matching structs
+<<<<<<< HEAD
+=======
+        # TODO: check param to select scan context version
+>>>>>>> master
         if self.params["frontend.sensor_type"] == "lidar":
             self.local_nnsm = ScanContextMatching()
         else:

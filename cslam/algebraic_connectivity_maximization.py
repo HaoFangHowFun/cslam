@@ -1,6 +1,8 @@
 from typing import NamedTuple
 
 import numpy as np
+import rclpy
+from rclpy.node import Node  # TODO: remove
 
 from cslam.mac.mac import MAC
 from cslam.mac.utils import Edge, weight_graph_lap_from_edge_list
@@ -509,7 +511,6 @@ class AlgebraicConnectivityMaximization(object):
             else:
                 w_init = self.random_initialization(nb_candidates_to_choose,
                                                     rekeyed_candidate_edges)
-
             if self.params[
                     "frontend.enable_sparsification"] and self.check_initial_fixed_measurements_exists(
                         is_robot_included):

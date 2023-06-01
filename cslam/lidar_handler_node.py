@@ -12,9 +12,13 @@ from rclpy.node import Node
 from rclpy.clock import Clock
 from diagnostic_msgs.msg import KeyValue
 
+<<<<<<< HEAD
 class LidarHandler: 
     """Front-End data handler for lidar data
     """
+=======
+class LidarHandler: # TODO: document
+>>>>>>> master
     def __init__(self, node, params):
         self.node = node
         self.params = params
@@ -63,12 +67,16 @@ class LidarHandler:
             self.latest_gps = NavSatFix()
 
     def lidar_callback(self, pc_msg, odom_msg):
+<<<<<<< HEAD
         """Sensor data callback
 
         Args:
             pc_msg (sensor_msgs/Pointcloud2): point cloud
             odom_msg (nav_msgs/Odometry): odometry estimate
         """
+=======
+        # If odom tracking failed, do not process the frame
+>>>>>>> master
         if (odom_msg.pose.covariance[0] > 1000):
             self.node.get_logger().warn("Odom tracking failed, skipping frame")
             return
@@ -77,6 +85,7 @@ class LidarHandler:
             self.gps_data.append(self.latest_gps)
 
     def gps_callback(self, gps_msg):
+<<<<<<< HEAD
         """GPS data callback
         """
         self.latest_gps = gps_msg
@@ -84,6 +93,11 @@ class LidarHandler:
     def send_local_descriptors_request(self, request):
         """Callback for local descriptors request
         """
+=======
+        self.latest_gps = gps_msg
+
+    def send_local_descriptors_request(self, request):
+>>>>>>> master
         out_msg = LocalPointCloudDescriptors()
         out_msg.data = icp_utils.open3d_to_ros(self.local_descriptors_map[request.keyframe_id])
         out_msg.keyframe_id = request.keyframe_id
@@ -97,8 +111,11 @@ class LidarHandler:
             self.log_publisher.publish(KeyValue(key="local_descriptors_cumulative_communication", value=str(self.log_local_descriptors_cumulative_communication)))
     
     def receive_local_descriptors(self, msg):
+<<<<<<< HEAD
         """Callback for local descriptors from other robots
         """
+=======
+>>>>>>> master
         frame_ids = []
         for i in range(len(msg.matches_robot_id)):
             if msg.matches_robot_id[i] == self.params["robot_id"]:
@@ -119,8 +136,11 @@ class LidarHandler:
             self.inter_robot_loop_closure_publisher.publish(out_msg)
 
     def receive_local_keyframe_match(self, msg):
+<<<<<<< HEAD
         """Callback for local keyframe match for intra-robot loop closures
         """
+=======
+>>>>>>> master
         pc0 = self.local_descriptors_map[msg.keyframe0_id]
         pc1 = self.local_descriptors_map[msg.keyframe1_id]
         transform, success = icp_utils.compute_transform(pc0, pc1, self.params["frontend.voxel_size"], self.params["frontend.registration_min_inliers"])
@@ -135,6 +155,7 @@ class LidarHandler:
         self.intra_robot_loop_closure_publisher.publish(out_msg)
 
     def odom_distance_squared(self, odom0, odom1):
+<<<<<<< HEAD
         """Compute the squared distance between two odometry messages
         """
         return (odom0.pose.pose.position.x - odom1.pose.pose.position.x)**2 + (odom0.pose.pose.position.y - odom1.pose.pose.position.y)**2 + (odom0.pose.pose.position.z - odom1.pose.pose.position.z)**2
@@ -148,6 +169,11 @@ class LidarHandler:
         Returns:
             bool: flag indicating if a new keyframe should be created.
         """
+=======
+        return (odom0.pose.pose.position.x - odom1.pose.pose.position.x)**2 + (odom0.pose.pose.position.y - odom1.pose.pose.position.y)**2 + (odom0.pose.pose.position.z - odom1.pose.pose.position.z)**2
+
+    def generate_new_keyframe(self, msg):
+>>>>>>> master
         if self.previous_odom is None:
             self.previous_odom = msg[1]
             return True 
@@ -159,8 +185,11 @@ class LidarHandler:
             return False
 
     def process_new_sensor_data(self):
+<<<<<<< HEAD
         """ Process new sensor data
         """
+=======
+>>>>>>> master
         if len(self.received_data) > 0:
             data = self.received_data[0]
             self.received_data.pop(0)

@@ -16,6 +16,7 @@ namespace cslam
 {
 
     class SimulatedRendezVous
+<<<<<<< HEAD
     { 
         /**
          * @brief Rendez-vous simulation.
@@ -30,6 +31,12 @@ namespace cslam
          * 
          * @return is alive flag
          */
+=======
+    { // TODO: document
+    public:
+        SimulatedRendezVous(std::shared_ptr<rclcpp::Node> &node, const std::string& schedule_file, const unsigned int &robot_id);
+
+>>>>>>> master
         bool is_alive();
 
     private:

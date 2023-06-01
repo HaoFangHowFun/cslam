@@ -1,10 +1,15 @@
 import cslam.lidar_pr.scancontext_utils as sc_utils
 
+<<<<<<< HEAD
 class ScanContext:
     """
     Scan Context descriptor for point clouds
     From: https://github.com/irapkaist/scancontext
     """
+=======
+# TODO: document
+class ScanContext:
+>>>>>>> master
     def __init__(self, params, node):
         self.node = node
         self.params = params
