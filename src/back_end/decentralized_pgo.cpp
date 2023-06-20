@@ -55,6 +55,12 @@ DecentralizedPGO::DecentralizedPGO(std::shared_ptr<rclcpp::Node> &node)
       std::bind(&DecentralizedPGO::inter_robot_loop_closure_callback, this,
                 std::placeholders::_1));
 
+  uwbranging_subscriber_ = node->create_subscription<
+      cslam_common_interfaces::msg::Uwbranging>(
+      "/cslam/Uwbranging", 1000,
+      std::bind(&DecentralizedPGO::uwbranging_callback, this,
+                std::placeholders::_1));
+
   write_current_estimates_subscriber_ =
       node->create_subscription<std_msgs::msg::String>(
           "cslam/print_current_estimates", 100,
@@ -317,6 +323,36 @@ void DecentralizedPGO::inter_robot_loop_closure_callback(
       connected_robots_.insert(msg->robot0_id);
     }
   }
+}
+
+void DecentralizedPGO::uwbranging_callback(
+    const cslam_common_interfaces::msg::Uwbranging::
+        ConstSharedPtr msg)
+{
+    //gtsam::Value measurement = msg->distance;
+
+  unsigned char robot0_c = ROBOT_LABEL(msg->robot0_id);
+  gtsam::LabeledSymbol symbol_from(GRAPH_LABEL, robot0_c,
+                                    msg->robot0_keyframe_id);
+  unsigned char robot1_c = ROBOT_LABEL(msg->robot1_id);
+  gtsam::LabeledSymbol symbol_to(GRAPH_LABEL, robot1_c, msg->robot1_keyframe_id);
+
+  gtsam::RangeFactor<gtsam::Pose3> factor =
+      gtsam::RangeFactor<gtsam::Pose3>(symbol_from, symbol_to, msg->distance,
+                                          0);
+
+  uwb_ranging_[{std::min(msg->robot0_id, msg->robot1_id),
+                              std::max(msg->robot0_id, msg->robot1_id)}]
+      .push_back(factor);
+  if (msg->robot0_id == robot_id_)
+  {
+    connected_robots_.insert(msg->robot1_id);
+  }
+  else if (msg->robot1_id == robot_id_)
+  {
+    connected_robots_.insert(msg->robot0_id);
+  }
+  
 }
 
 void DecentralizedPGO::write_current_estimates_callback(
