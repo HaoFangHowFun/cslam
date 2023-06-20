@@ -685,7 +685,7 @@ void DecentralizedPGO::optimized_estimates_callback(
       first_pose = current_pose_estimates_->at<gtsam::Pose3>(first_symbol);
     }
     update_transform_to_origin(first_pose);
-
+    RCLCPP_INFO(node_->get_logger(), "Uptimize pose is %f",first_pose);
     if (enable_logs_) {
       try{
         logger_->write_logs();
