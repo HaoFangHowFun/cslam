@@ -130,20 +130,20 @@ DecentralizedPGO::DecentralizedPGO(std::shared_ptr<rclcpp::Node> &node)
           "cslam/optimizer_state", 100);
 
   // Initialize inter-robot loop closures measurements
-  for (unsigned int i = 0; i < max_nb_robots_; i++)
-  {
-    for (unsigned int j = i + 1; j < max_nb_robots_; j++)
-    {
-      inter_robot_loop_closures_.insert(
-          {{i, j}, std::vector<gtsam::BetweenFactor<gtsam::Pose3>>()});
-    }
-  }
+  // for (unsigned int i = 0; i < max_nb_robots_; i++)
+  // {
+  //   for (unsigned int j = i + 1; j < max_nb_robots_; j++)
+  //   {
+  //     inter_robot_loop_closures_.insert(
+  //         {{i, j}, std::vector<gtsam::BetweenFactor<gtsam::Pose3>>()});
+  //   }
+  // }
   // Initialize uwb_ranging 
   for (unsigned int i = 0; i < max_nb_robots_; i++)
   {
     for (unsigned int j = i + 1; j < max_nb_robots_; j++)
     {
-      inter_robot_loop_closures_.insert(
+      uwb_ranging_.insert(
           {{i, j}, std::vector<gtsam::RangeFactor<gtsam::Pose3>>()});
     }
   }
