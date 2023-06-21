@@ -138,6 +138,15 @@ DecentralizedPGO::DecentralizedPGO(std::shared_ptr<rclcpp::Node> &node)
           {{i, j}, std::vector<gtsam::BetweenFactor<gtsam::Pose3>>()});
     }
   }
+  // Initialize uwb_ranging 
+  for (unsigned int i = 0; i < max_nb_robots_; i++)
+  {
+    for (unsigned int j = i + 1; j < max_nb_robots_; j++)
+    {
+      inter_robot_loop_closures_.insert(
+          {{i, j}, std::vector<gtsam::RangeFactor<gtsam::Pose3>>()});
+    }
+  }
 
   // Get neighbors ROS 2 objects
   get_current_neighbors_publisher_ =
@@ -412,6 +421,36 @@ cslam_common_interfaces::msg::PoseGraph DecentralizedPGO::fill_pose_graph_msg(){
   return fill_pose_graph_msg(current_robots_ids.robots);
 }
 
+// cslam_common_interfaces::msg::PoseGraph DecentralizedPGO::fill_pose_graph_msg(const cslam_common_interfaces::msg::RobotIds& msg){
+//   cslam_common_interfaces::msg::PoseGraph out_msg;
+//   out_msg.robot_id = robot_id_;
+//   out_msg.values = gtsam_values_to_msg(odometry_pose_estimates_);
+//   auto graph = boost::make_shared<gtsam::NonlinearFactorGraph>();
+//   graph->push_back(pose_graph_->begin(), pose_graph_->end());
+
+//   std::set<unsigned int> connected_robots;
+
+//   for (unsigned int i = 0; i < msg.ids.size(); i++)
+//   {
+//     for (unsigned int j = i + 1; j < msg.ids.size(); j++)
+//     {
+//       unsigned int min_robot_id = std::min(msg.ids[i], msg.ids[j]);
+//       unsigned int max_robot_id = std::max(msg.ids[i], msg.ids[j]);
+//       if (inter_robot_loop_closures_[{min_robot_id, max_robot_id}].size() > 0 &&
+//           (min_robot_id == robot_id_ || max_robot_id == robot_id_))
+//       {
+//         connected_robots.insert(min_robot_id);
+//         connected_robots.insert(max_robot_id);
+//         if (min_robot_id == robot_id_)
+//         {
+//           graph->push_back(
+//               inter_robot_loop_closures_[{min_robot_id, max_robot_id}].begin(),
+//               inter_robot_loop_closures_[{min_robot_id, max_robot_id}].end());
+//         }
+//       }
+//     }
+//   }
+
 cslam_common_interfaces::msg::PoseGraph DecentralizedPGO::fill_pose_graph_msg(const cslam_common_interfaces::msg::RobotIds& msg){
   cslam_common_interfaces::msg::PoseGraph out_msg;
   out_msg.robot_id = robot_id_;
@@ -427,7 +466,7 @@ cslam_common_interfaces::msg::PoseGraph DecentralizedPGO::fill_pose_graph_msg(co
     {
       unsigned int min_robot_id = std::min(msg.ids[i], msg.ids[j]);
       unsigned int max_robot_id = std::max(msg.ids[i], msg.ids[j]);
-      if (inter_robot_loop_closures_[{min_robot_id, max_robot_id}].size() > 0 &&
+      if (uwb_ranging_[{min_robot_id, max_robot_id}].size() > 0 &&
           (min_robot_id == robot_id_ || max_robot_id == robot_id_))
       {
         connected_robots.insert(min_robot_id);
@@ -435,12 +474,13 @@ cslam_common_interfaces::msg::PoseGraph DecentralizedPGO::fill_pose_graph_msg(co
         if (min_robot_id == robot_id_)
         {
           graph->push_back(
-              inter_robot_loop_closures_[{min_robot_id, max_robot_id}].begin(),
-              inter_robot_loop_closures_[{min_robot_id, max_robot_id}].end());
+              uwb_ranging_[{min_robot_id, max_robot_id}].begin(),
+              uwb_ranging_[{min_robot_id, max_robot_id}].end());
         }
       }
     }
   }
+
 
   out_msg.edges = gtsam_factors_to_msg(graph);
   for (auto id : connected_robots)
@@ -732,6 +772,41 @@ void DecentralizedPGO::heartbeat_timer_callback()
   heartbeat_publisher_->publish(msg);
 }
 
+// void DecentralizedPGO::visualization_callback()
+// {
+//   if (visualization_pose_graph_publisher_->get_subscription_count() > 0)
+//   {
+//     cslam_common_interfaces::msg::PoseGraph out_msg;
+//     out_msg.robot_id = robot_id_;
+//     out_msg.origin_robot_id = origin_robot_id_;
+//     out_msg.values = gtsam_values_to_msg(current_pose_estimates_);
+//     auto graph = boost::make_shared<gtsam::NonlinearFactorGraph>();
+//     graph->push_back(pose_graph_->begin(), pose_graph_->end());
+
+//     for (unsigned int i = 0; i < max_nb_robots_; i++)
+//     {
+//       for (unsigned int j = i + 1; j < max_nb_robots_; j++)
+//       {
+//         unsigned int min_robot_id = std::min(i, j);
+//         unsigned int max_robot_id = std::max(i, j);
+//         if (inter_robot_loop_closures_[{min_robot_id, max_robot_id}].size() > 0 &&
+//             (min_robot_id == robot_id_ || max_robot_id == robot_id_))
+//         {
+//           if (min_robot_id == robot_id_)
+//           {
+//             graph->push_back(
+//                 inter_robot_loop_closures_[{min_robot_id, max_robot_id}].begin(),
+//                 inter_robot_loop_closures_[{min_robot_id, max_robot_id}].end());
+//           }
+//         }
+//       }
+//     }
+
+//     out_msg.edges = gtsam_factors_to_msg(graph);
+//     visualization_pose_graph_publisher_->publish(out_msg);
+//   }
+// }
+
 void DecentralizedPGO::visualization_callback()
 {
   if (visualization_pose_graph_publisher_->get_subscription_count() > 0)
@@ -749,14 +824,14 @@ void DecentralizedPGO::visualization_callback()
       {
         unsigned int min_robot_id = std::min(i, j);
         unsigned int max_robot_id = std::max(i, j);
-        if (inter_robot_loop_closures_[{min_robot_id, max_robot_id}].size() > 0 &&
+        if (uwb_ranging_[{min_robot_id, max_robot_id}].size() > 0 &&
             (min_robot_id == robot_id_ || max_robot_id == robot_id_))
         {
           if (min_robot_id == robot_id_)
           {
             graph->push_back(
-                inter_robot_loop_closures_[{min_robot_id, max_robot_id}].begin(),
-                inter_robot_loop_closures_[{min_robot_id, max_robot_id}].end());
+                uwb_ranging_[{min_robot_id, max_robot_id}].begin(),
+                uwb_ranging_[{min_robot_id, max_robot_id}].end());
           }
         }
       }
