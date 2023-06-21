@@ -333,7 +333,7 @@ void DecentralizedPGO::uwbranging_callback(
         ConstSharedPtr msg)
 {
     //gtsam::Value measurement = msg->distance;
-
+  RCLCPP_INFO(node_->get_logger(),"UWB_call_back_begin");
   unsigned char robot0_c = ROBOT_LABEL(msg->robot0_id);
   gtsam::LabeledSymbol symbol_from(GRAPH_LABEL, robot0_c,
                                     msg->robot0_keyframe_id);
