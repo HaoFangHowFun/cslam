@@ -653,36 +653,36 @@ DecentralizedPGO::aggregate_pose_graphs()
     }
   }
 
-  std::set<std::pair<gtsam::Key, gtsam::Key>> added_loop_closures;
-  // Add local inter-robot loop closures
-  auto included_robots_ids = current_neighbors_ids_;
-  included_robots_ids.robots.ids.push_back(robot_id_);
-  for (unsigned int i = 0; i < included_robots_ids.robots.ids.size(); i++)
-  {
-    for (unsigned int j = i + 1; j < included_robots_ids.robots.ids.size();
-         j++)
-    {
-      if (is_pose_graph_connected[included_robots_ids.robots.ids[i]] &&
-          is_pose_graph_connected[included_robots_ids.robots.ids[j]])
-      {
-        unsigned int min_id = std::min(included_robots_ids.robots.ids[i],
-                                       included_robots_ids.robots.ids[j]);
-        unsigned int max_id = std::max(included_robots_ids.robots.ids[i],
-                                       included_robots_ids.robots.ids[j]);
-        for (const auto &factor :
-             inter_robot_loop_closures_[{min_id, max_id}])
-        {
-          if (estimates->exists(factor.key1()) &&
-              estimates->exists(factor.key2()) &&
-              added_loop_closures.count({factor.key1(), factor.key2()}) == 0)
-          {
-            graph->push_back(factor);
-            added_loop_closures.insert({factor.key1(), factor.key2()});
-          }
-        }
-      }
-    }
-  }
+  // std::set<std::pair<gtsam::Key, gtsam::Key>> added_loop_closures;
+  // // Add local inter-robot loop closures
+  // auto included_robots_ids = current_neighbors_ids_;
+  // included_robots_ids.robots.ids.push_back(robot_id_);
+  // for (unsigned int i = 0; i < included_robots_ids.robots.ids.size(); i++)
+  // {
+  //   for (unsigned int j = i + 1; j < included_robots_ids.robots.ids.size();
+  //        j++)
+  //   {
+  //     if (is_pose_graph_connected[included_robots_ids.robots.ids[i]] &&
+  //         is_pose_graph_connected[included_robots_ids.robots.ids[j]])
+  //     {
+  //       unsigned int min_id = std::min(included_robots_ids.robots.ids[i],
+  //                                      included_robots_ids.robots.ids[j]);
+  //       unsigned int max_id = std::max(included_robots_ids.robots.ids[i],
+  //                                      included_robots_ids.robots.ids[j]);
+  //       for (const auto &factor :
+  //            inter_robot_loop_closures_[{min_id, max_id}])
+  //       {
+  //         if (estimates->exists(factor.key1()) &&
+  //             estimates->exists(factor.key2()) &&
+  //             added_loop_closures.count({factor.key1(), factor.key2()}) == 0)
+  //         {
+  //           graph->push_back(factor);
+  //           added_loop_closures.insert({factor.key1(), factor.key2()});
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
   // Add other robots factors
   for (auto id : current_neighbors_ids_.robots.ids)
   {
