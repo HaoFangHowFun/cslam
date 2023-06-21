@@ -70,10 +70,13 @@ DecentralizedPGO::DecentralizedPGO(std::shared_ptr<rclcpp::Node> &node)
   rotation_default_noise_std_ = 0.01;
   translation_default_noise_std_ = 0.1;
   Eigen::VectorXd sigmas(6);
+  Eigen::VectorXd sigma(1);
   sigmas << rotation_default_noise_std_, rotation_default_noise_std_,
       rotation_default_noise_std_, translation_default_noise_std_,
       translation_default_noise_std_, translation_default_noise_std_;
   default_noise_model_ = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
+  sigma << translation_default_noise_std_;
+  uwb_noise_model_= gtsam::noiseModel::Diagonal::Sigmas(sigma);
   pose_graph_ = boost::make_shared<gtsam::NonlinearFactorGraph>();
   current_pose_estimates_ = boost::make_shared<gtsam::Values>();
   odometry_pose_estimates_ = boost::make_shared<gtsam::Values>();
