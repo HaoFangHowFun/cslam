@@ -308,6 +308,7 @@ namespace cslam
         bool enable_visualization_;
 
         gtsam::SharedNoiseModel default_noise_model_;
+        gtsam::SharedNoiseModel uwb_noise_model_;
         float rotation_default_noise_std_, translation_default_noise_std_;
 
         gtsam::NonlinearFactorGraph::shared_ptr pose_graph_;

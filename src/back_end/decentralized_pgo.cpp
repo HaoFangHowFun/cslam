@@ -342,7 +342,7 @@ void DecentralizedPGO::uwbranging_callback(
 
   gtsam::RangeFactor<gtsam::Pose3> factor =
       gtsam::RangeFactor<gtsam::Pose3>(symbol_from, symbol_to, msg->distance,
-                                          0);
+                                          uwb_noise_model_);
 
   uwb_ranging_[{std::min(msg->robot0_id, msg->robot1_id),
                               std::max(msg->robot0_id, msg->robot1_id)}]
