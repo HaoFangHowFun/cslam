@@ -49,11 +49,11 @@ DecentralizedPGO::DecentralizedPGO(std::shared_ptr<rclcpp::Node> &node)
       std::bind(&DecentralizedPGO::intra_robot_loop_closure_callback, this,
                 std::placeholders::_1));
 
-  inter_robot_loop_closure_subscriber_ = node->create_subscription<
-      cslam_common_interfaces::msg::InterRobotLoopClosure>(
-      "/cslam/inter_robot_loop_closure", 1000,
-      std::bind(&DecentralizedPGO::inter_robot_loop_closure_callback, this,
-                std::placeholders::_1));
+  // inter_robot_loop_closure_subscriber_ = node->create_subscription<
+  //     cslam_common_interfaces::msg::InterRobotLoopClosure>(
+  //     "/cslam/inter_robot_loop_closure", 1000,
+  //     std::bind(&DecentralizedPGO::inter_robot_loop_closure_callback, this,
+  //               std::placeholders::_1));
 
   uwbranging_subscriber_ = node->create_subscription<
       cslam_common_interfaces::msg::Uwbranging>(
@@ -296,37 +296,37 @@ void DecentralizedPGO::intra_robot_loop_closure_callback(
   }
 }
 
-void DecentralizedPGO::inter_robot_loop_closure_callback(
-    const cslam_common_interfaces::msg::InterRobotLoopClosure::
-        ConstSharedPtr msg)
-{
-  if (msg->success)
-  {
-    gtsam::Pose3 measurement = transform_msg_to_pose3(msg->transform);
+// void DecentralizedPGO::inter_robot_loop_closure_callback(
+//     const cslam_common_interfaces::msg::InterRobotLoopClosure::
+//         ConstSharedPtr msg)
+// {
+//   if (msg->success)
+//   {
+//     gtsam::Pose3 measurement = transform_msg_to_pose3(msg->transform);
 
-    unsigned char robot0_c = ROBOT_LABEL(msg->robot0_id);
-    gtsam::LabeledSymbol symbol_from(GRAPH_LABEL, robot0_c,
-                                     msg->robot0_keyframe_id);
-    unsigned char robot1_c = ROBOT_LABEL(msg->robot1_id);
-    gtsam::LabeledSymbol symbol_to(GRAPH_LABEL, robot1_c, msg->robot1_keyframe_id);
+//     unsigned char robot0_c = ROBOT_LABEL(msg->robot0_id);
+//     gtsam::LabeledSymbol symbol_from(GRAPH_LABEL, robot0_c,
+//                                      msg->robot0_keyframe_id);
+//     unsigned char robot1_c = ROBOT_LABEL(msg->robot1_id);
+//     gtsam::LabeledSymbol symbol_to(GRAPH_LABEL, robot1_c, msg->robot1_keyframe_id);
 
-    gtsam::BetweenFactor<gtsam::Pose3> factor =
-        gtsam::BetweenFactor<gtsam::Pose3>(symbol_from, symbol_to, measurement,
-                                           default_noise_model_);
+//     gtsam::BetweenFactor<gtsam::Pose3> factor =
+//         gtsam::BetweenFactor<gtsam::Pose3>(symbol_from, symbol_to, measurement,
+//                                            default_noise_model_);
 
-    inter_robot_loop_closures_[{std::min(msg->robot0_id, msg->robot1_id),
-                                std::max(msg->robot0_id, msg->robot1_id)}]
-        .push_back(factor);
-    if (msg->robot0_id == robot_id_)
-    {
-      connected_robots_.insert(msg->robot1_id);
-    }
-    else if (msg->robot1_id == robot_id_)
-    {
-      connected_robots_.insert(msg->robot0_id);
-    }
-  }
-}
+//     inter_robot_loop_closures_[{std::min(msg->robot0_id, msg->robot1_id),
+//                                 std::max(msg->robot0_id, msg->robot1_id)}]
+//         .push_back(factor);
+//     if (msg->robot0_id == robot_id_)
+//     {
+//       connected_robots_.insert(msg->robot1_id);
+//     }
+//     else if (msg->robot1_id == robot_id_)
+//     {
+//       connected_robots_.insert(msg->robot0_id);
+//     }
+//   }
+// }
 
 void DecentralizedPGO::uwbranging_callback(
     const cslam_common_interfaces::msg::Uwbranging::
